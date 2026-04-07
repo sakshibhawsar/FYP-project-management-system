@@ -1,0 +1,215 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Educational Project Management System Design System */
+
+@layer base {
+  :root {
+    /* Main backgrounds */
+    --background: 248 250 252; /* slate-50 */
+    --foreground: 215 28% 17%; /* slate-800 */
+    
+    /* Educational color palette */
+    --primary: 217 91% 60%; /* blue-500 - educational blue */
+    --primary-light: 213 97% 87%; /* blue-200 */
+    --primary-dark: 217 91% 45%; /* blue-600 */
+    --primary-foreground: 0 0% 100%; /* white */
+    
+    --secondary: 142 76% 36%; /* green-600 - success/complete */
+    --secondary-light: 142 69% 58%; /* green-500 */
+    --secondary-foreground: 0 0% 100%; /* white */
+    
+    --accent: 47 96% 53%; /* yellow-400 - warnings/pending */
+    --accent-light: 48 96% 89%; /* yellow-100 */
+    --accent-foreground: 215 28% 17%; /* slate-800 */
+    
+    --danger: 0 84% 60%; /* red-500 */
+    --danger-light: 0 93% 94%; /* red-50 */
+    --danger-foreground: 0 0% 100%; /* white */
+    
+    /* Card and surface colors */
+    --card: 0 0% 100%; /* white */
+    --card-foreground: 215 28% 17%; /* slate-800 */
+    --card-border: 214 32% 91%; /* slate-200 */
+    
+    /* Input and form colors */
+    --input: 0 0% 100%; /* white */
+    --input-border: 214 32% 91%; /* slate-200 */
+    --input-focus: 217 91% 60%; /* blue-500 */
+    
+    /* Text hierarchy */
+    --text-primary: 215 28% 17%; /* slate-800 */
+    --text-secondary: 215 20% 65%; /* slate-500 */
+    --text-muted: 215 16% 47%; /* slate-600 */
+    
+    /* Sidebar colors */
+    --sidebar-bg: 0 0% 100%; /* white */
+    --sidebar-border: 214 32% 91%; /* slate-200 */
+    --sidebar-hover: 214 32% 96%; /* slate-100 */
+    --sidebar-active: 213 97% 87%; /* blue-200 */
+    
+    /* Status colors */
+    --status-pending: 47 96% 53%; /* yellow-400 */
+    --status-approved: 142 76% 36%; /* green-600 */
+    --status-rejected: 0 84% 60%; /* red-500 */
+    --status-completed: 142 76% 36%; /* green-600 */
+    
+    /* Shadows and borders */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    
+    --radius: 0.5rem;
+    --radius-sm: 0.25rem;
+    --radius-lg: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-slate-200;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-800 font-sans;
+  }
+}
+
+@layer components {
+  /* Button Components */
+  .btn-primary {
+    @apply bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-200 font-medium;
+  }
+  
+  .btn-secondary {
+    @apply bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-blue-500 text-blue-500 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors duration-200 font-medium;
+  }
+  
+  .btn-danger {
+    @apply bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors duration-200 font-medium;
+  }
+  
+  .btn-small {
+    @apply px-3 py-1.5 text-sm;
+  }
+  
+  /* Card Components */
+  .card {
+    @apply bg-white rounded-lg shadow-sm border border-slate-200 p-6;
+  }
+  
+  .card-header {
+    @apply border-b border-slate-200 pb-4 mb-4;
+  }
+  
+  .card-title {
+    @apply text-lg font-semibold text-slate-800;
+  }
+  
+  .card-subtitle {
+    @apply text-sm text-slate-600 mt-1;
+  }
+  
+  /* Input Components */
+  .input {
+    @apply w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
+  
+  .input-error {
+    @apply border-red-300 focus:ring-red-500;
+  }
+  
+  .label {
+    @apply block text-sm font-medium text-slate-700 mb-2;
+  }
+  
+  /* Table Components */
+  .table {
+    @apply w-full bg-white rounded-lg overflow-hidden shadow-sm border border-slate-200;
+  }
+  
+  .table-header {
+    @apply bg-slate-50 border-b border-slate-200;
+  }
+  
+  .table-row {
+    @apply border-b border-slate-100 hover:bg-slate-50 transition-colors duration-150;
+  }
+  
+  .table-cell {
+    @apply px-6 py-4 text-sm;
+  }
+  
+  .table-header-cell {
+    @apply px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider;
+  }
+  
+  /* Status Badges */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-pending {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+  
+  .badge-approved {
+    @apply bg-green-100 text-green-800;
+  }
+  
+  .badge-rejected {
+    @apply bg-red-100 text-red-800;
+  }
+  
+  .badge-completed {
+    @apply bg-green-100 text-green-800;
+  }
+  
+  /* Navigation */
+  .nav-link {
+    @apply flex items-center px-4 py-2 text-slate-700 hover:bg-slate-100 hover:text-blue-600 transition-all duration-200 rounded-lg;
+  }
+  
+  .nav-link-active {
+    @apply bg-blue-100 text-blue-700 font-medium;
+  }
+  
+  /* Modal */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+  }
+  
+  .modal-content {
+    @apply bg-white rounded-lg shadow-lg max-w-md w-full mx-4;
+  }
+  
+  /* Animations */
+  .fade-in {
+    @apply animate-in fade-in duration-200;
+  }
+  
+  .slide-in {
+    @apply animate-in slide-in-from-right duration-300;
+  }
+}
