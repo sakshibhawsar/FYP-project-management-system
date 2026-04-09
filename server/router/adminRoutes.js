@@ -1,10 +1,24 @@
 import express from "express";
-import { assignSupervisor, createStudent, createTeacher, deleteStudent, deleteTeacher, getAllProject, getallUsers, getDashboardStats, getProject, updateProjectStatus, updateStudent, updateTeacher } from "../controller/adminController.js";
+import { approveUser, assignSupervisor, createStudent, createTeacher, deleteStudent, deleteTeacher, getAllProject, getallUsers, getDashboardStats, getPendingUsers, getProject, updateProjectStatus, updateStudent, updateTeacher } from "../controller/adminController.js";
 import multer  from "multer";
 import { isAuthenticated,isAuthorized } from "../middleware/authMiddleWare.js";
 
 const router=express.Router();
 
+//get pending users
+router.get(
+  "/pending-users",
+  isAuthenticated,
+  isAuthorized("Admin"),
+  getPendingUsers
+);
+router.put(
+  "/approve-user",
+  isAuthenticated,
+  isAuthorized("Admin"),
+  approveUser
+);
+// student routes
 router.post("/create-student",
     isAuthenticated,
     isAuthorized("Admin"),

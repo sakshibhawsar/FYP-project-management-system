@@ -37,6 +37,8 @@ import { Loader } from "lucide-react";
 import { getUser } from "./store/slices/authSlice";
 import { getAllProjects, getAllUsers } from "./store/slices/adminSlice";
 import { fetchDashboardStats } from "./store/slices/studentSlice";
+import RegisterPage from "./pages/auth/RegisterPage";
+import PendingUser from "./pages/admin/PendingUser";
 
 const App = () => {
   const { authUser, isCheckingAuth } = useSelector((state) => state.auth);
@@ -60,6 +62,9 @@ const App = () => {
   const ProtectedRoute = ({ children, allowedRoles }) => {
     if (!authUser) {
       return <Navigate to="/login" replace />;
+    }
+    if (!authUser.isApproved) {
+      return <Navigate to="/unauthorized" replace />;
     }
     if (
       allowedRoles?.length &&
@@ -89,6 +94,7 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         {/* auth Routes */}
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
@@ -104,6 +110,7 @@ const App = () => {
           <Route index element={<AdminDashboard />} />
           <Route path="students" element={<ManageStudents />} />
           <Route path="teachers" element={<ManageTeachers />} />
+          <Route path="pending-users" element={<PendingUser />} />
           <Route path="assign-supervisor" element={<AssignSupervisor />} />
           <Route path="deadlines" element={<DeadlinesPage />} />
           <Route path="projects" element={<ProjectsPage />} />

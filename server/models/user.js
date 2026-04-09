@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema({
         default:'Student',
         enum:['Student','Teacher','Admin'],
     },
+    isApproved: {
+  type: Boolean,
+  default: false
+},
     resetPasswordToken:String,
     resetPasswordExpire:Date,
 

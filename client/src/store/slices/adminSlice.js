@@ -2,6 +2,38 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { axiosInstance } from "../../lib/axios";
 import { toast } from "react-toastify";
 
+// get pending users
+export const getPendingUsers = createAsyncThunk(
+  "admin/getPendingUsers",
+  async (_, thunkAPI) => {
+    try {
+      const res = await axiosInstance.get("/admin/pending-users");
+      return res.data.users;
+      
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data.message);
+    }
+  }
+);
+
+export const approveUser = createAsyncThunk(
+  "admin/approveUser",
+  async ({ userId, role }, thunkAPI) => {
+    try {
+      const res = await axiosInstance.put("/admin/approve-user", {
+        userId,
+        role,
+      });
+
+      return res.data.user; //  updated user return
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Approval failed"
+      );
+    }
+  }
+);
+
 //student
 export const createStudent=createAsyncThunk("createStudent",async(data,thunkAPI)=>{
   try {
@@ -155,6 +187,7 @@ const adminSlice = createSlice({
     teachers: [],
     projects: [],
     users: [],
+    pendingUsers: [],
     stats: null,
     loading: false,
     error: null,
@@ -178,9 +211,23 @@ if(state.users){
       }
     })
      .addCase(getAllUsers.fulfilled,(state,action)=>{
+  state.users = action.payload.users.filter(u => u.isApproved);
+})
+       .addCase(getPendingUsers.fulfilled,(state,action)=>{
 
-        state.users=action.payload.users
+        state.pendingUsers=action.payload
       })
+      .addCase(approveUser.fulfilled, (state, action) => {
+  state.loading = false;
+
+  state.pendingUsers = state.pendingUsers.filter(
+    (user) => user._id !== action.payload._id
+  );
+  state.users.unshift(action.payload);
+
+  toast.success("User approved successfully");
+})
+
  .addCase(getAllProjects.fulfilled,(state,action)=>{
         state.projects=action.payload.projects
       })

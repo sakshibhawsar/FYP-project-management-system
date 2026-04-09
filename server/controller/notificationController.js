@@ -17,10 +17,13 @@ export const getNotifications=asyncHandler(async(req,res,next)=>{
         query.user=userId;
     }
 
-    const notifications=await Notification.find(query).sort({createdAt:-1})
-    const unreadOnly=notifications.filter((n)=>!n.isRead)
-    const readOnly=notifications.filter((n)=>n.isRead)
-    const highPriorityMessages=notifications.filter((n)=>n.priority==="high");
+    const notifications=await Notification.find(query).populate("user").sort({createdAt:-1})
+    const validNotifications = notifications.filter(
+  (n) => n.user !== null
+);
+    const unreadOnly=validNotifications.filter((n)=>!n.isRead)
+    const readOnly=validNotifications.filter((n)=>n.isRead)
+    const highPriorityMessages=validNotifications.filter((n)=>n.priority==="high");
 
     const now=new Date();
     const dayOfWeek=now.getDay();
@@ -41,7 +44,7 @@ export const getNotifications=asyncHandler(async(req,res,next)=>{
         success:true,
         message:"Notifications fetch successfully",
         data:{
-            notifications,
+            notifications:validNotifications,
             unreadOnly:unreadOnly.length,
             readOnly:readOnly.length,
             highPriorityMessages:highPriorityMessages.length,

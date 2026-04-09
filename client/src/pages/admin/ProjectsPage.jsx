@@ -16,15 +16,7 @@ const ProjectsPage = () => {
   const [isReportOpen, setIsReportOpen] = useState(false);
   const [reportSearch, setReportSearch] = useState("");
   const [showViewModal, setShowViewModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [currentProject, setCurrentProject] = useState(null);
-  const [editForm, setEditForm] = useState({
-    title: "",
-    description: "",
-    deadline: "",
-  });
-
-  const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
   const { projects } = useSelector((state) => state.admin);

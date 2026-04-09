@@ -13,7 +13,7 @@ export const streamDownload=(filePath,res,originalName)=>{
         })
     } catch (error) {
         if(error instanceof ErrorHandler){
-            return res.status(err.statusCode).json({
+            return res.status(error.statusCode).json({
                 success:false,
                 error:error.message
             })
@@ -24,4 +24,3 @@ export const streamDownload=(filePath,res,originalName)=>{
         })
     }
 }
-

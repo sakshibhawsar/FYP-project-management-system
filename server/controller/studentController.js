@@ -208,18 +208,31 @@ res.status(200).json({
     data:{feedback:sortedFeedback}
 })
 })
+export const downloadFile = asyncHandler(async (req, res, next) => {
+  const { projectId, fileId } = req.params;
+  const studentId = req.user._id;
 
-export const downloadFile=asyncHandler(async(req,res,next)=>{
-const {projectId,fileId}=req.params;
-const studentId=req.user._id;
+  const project = await projectServices.getProjectById(projectId);
 
-const project=await projectServices.getProjectById(projectId)
-if(!project) return next(new ErrorHandler("Project not found",404))
-if(project.student._id.toString()!==studentId.toString()){
-    return next(new ErrorHandler("Not authorized to download file",403))
-}
-    const file=project.files.id(fileId);
-    if(!file) return next(new ErrorHandler("file not found",404))
+  if (!project) return next(new ErrorHandler("Project not found", 404));
 
-  fileServices.streamDownload(file.fileUrl,res,file.originalName);
-})
+  if (project.student._id.toString() !== studentId.toString()) {
+    return next(new ErrorHandler("Not authorized", 403));
+  }
+
+  const file = project.files.find(
+    (f) => f._id.toString() === fileId
+  );
+
+  if (!file) return next(new ErrorHandler("File not found", 404));
+
+  const downloadUrl = file.fileUrl.replace(
+    "/upload/",
+    "/upload/fl_attachment/"
+  );
+
+  return res.status(200).json({
+    success: true,
+    url: downloadUrl,
+  });
+});

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../store/slices/authSlice";
 import { BookOpen, Loader } from "lucide-react";
+import { toast } from "react-toastify";
 
 const LoginPage = () => {
   const dispatch = useDispatch();
@@ -12,7 +13,6 @@ const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    role: "Student",
   });
 
   const [error, setError] = useState({});
@@ -50,23 +50,31 @@ const LoginPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) {
-      return;
+    if (!validateForm()) return;
+
+    const res = await dispatch(login(formData));
+
+    if (res.meta.requestStatus === "fulfilled") {
+      const user = res.payload.user;
+      if (!user.isApproved) {
+        toast.error("Wait for admin approval");
+        return;
+      }
+      if (user.role === "Admin") {
+        navigate("/admin");
+      } else if (user.role === "Teacher") {
+        navigate("/teacher");
+      } else {
+        navigate("/student");
+      }
     }
-    const data = new FormData();
-
-    data.append("email", formData.email);
-    data.append("password", formData.password);
-    data.append("role", formData.role);
-
-    dispatch(login(data));
   };
 
   useEffect(() => {
     if (authUser) {
-      switch (formData.role) {
+      switch (authUser.role) {
         case "Student":
           navigate("/student");
           break;
@@ -105,20 +113,6 @@ const LoginPage = () => {
                   <p className="text-sm text-red-600">{error.general}</p>
                 </div>
               )}
-
-              {/* Role selection */}
-              <div>
-                <label className="label">Select Role</label>
-                <select
-                  name="role"
-                  className="input"
-                  value={formData.role}
-                  onChange={handleChange}>
-                  <option value="Student">Student</option>
-                  <option value="Teacher">Teacher</option>
-                  <option value="Admin">Admin</option>
-                </select>
-              </div>
 
               {/* Email */}
               <div>
@@ -166,15 +160,23 @@ const LoginPage = () => {
                 className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={isLoggingIn}
                 type="submit">
-               {
-                  isLoggingIn ? (
-                    <div className="flex items-center justify-center">
-                      <Loader className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"/>
-                      Signing In...
-                    </div>
-                  ):"Sign In"
-               }
+                {isLoggingIn ? (
+                  <div className="flex items-center justify-center">
+                    <Loader className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
+                    Signing In...
+                  </div>
+                ) : (
+                  "Sign In"
+                )}
               </button>
+              <p className="text-center text-gray-600">
+                Already have an account?{" "}
+                <a
+                  href="/register"
+                  className="text-indigo-600 hover:text-indigo-700 font-semibold">
+                  Sign Up
+                </a>
+              </p>
             </form>
           </div>
         </div>

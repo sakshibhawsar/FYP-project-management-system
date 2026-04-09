@@ -8,34 +8,54 @@ import crypto from "crypto";
 
 //REGISTER USER
 export const registerUser = asyncHandler(async(req,res,next)=>{
-    const {name,email,password,role}=req.body;
-    if(!name || !email || !password|| !role){
+    const {name,email,password} = req.body;
+
+    if(!name || !email || !password){
         return next(new ErrorHandler("Please provide all required fields"));
     }
+
     let user = await User.findOne({email});
     if(user){
         return next(new ErrorHandler("User already exists",400));
     }
-    user=new User({name,email,password,role});
+
+    user = new User({
+        name,
+        email,
+        password,
+        role: "Student",     
+        isApproved: false     
+    });
+
     await user.save();
-   generateToken(user,201,"User Registered Successfully",res);
-    
+
+    generateToken(user,201,"User Registered Successfully",res);
 });
 
-export const login=asyncHandler(async(req,res,next)=>{
-const {email,password,role}=req.body;
-if(!email || !password|| !role){
-    return next(new ErrorHandler("Please provide email, password and role",400));
-}
-const user=await User.findOne({email,role}).select("+password");
-if(!user){
-    return next(new ErrorHandler("Invalid email, password or role" ,401));
-}
-const isMatch=await user.comparePassword(password);
-if(!isMatch){
-    return next(new ErrorHandler("Invalid email, password or role",401));
-}
-generateToken(user,200,"Login Successful",res);
+export const login = asyncHandler(async(req,res,next)=>{
+    const {email,password} = req.body;
+
+    if(!email || !password){
+        return next(new ErrorHandler("Please provide email and password",400));
+    }
+
+    const user = await User.findOne({email}).select("+password");
+
+    if(!user){
+        return next(new ErrorHandler("Invalid email or password",401));
+    }
+
+    const isMatch = await user.comparePassword(password);
+
+    if(!isMatch){
+        return next(new ErrorHandler("Invalid email or password",401));
+    }
+
+    if(!user.isApproved){
+        return next(new ErrorHandler("Wait for admin approval",403));
+    }
+
+    generateToken(user,200,"Login Successful",res);
 });
 
 

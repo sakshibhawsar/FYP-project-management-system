@@ -6,6 +6,62 @@ import * as notificationService from "../services/notificationService.js"
 import User from "../models/user.js"
 import {Project} from "../models/project.js"
 import {SupervisorRequest} from "../models/supervisorRequest.js"
+import { generateApprovalEmailTemplate } from "../utils/generateApprovalEmailTemplate.js";
+import { sendEmail } from "../services/emailService.js";
+
+export const getPendingUsers = asyncHandler(async (req, res, next) => {
+  const users = await User.find({ isApproved: false ,role: { $in: ["Student", "Teacher"] },}).sort({ createdAt: -1 });
+
+  res.status(200).json({
+    success: true,
+    count: users.length,
+    users,
+  });
+});
+
+export const approveUser = asyncHandler(async (req, res, next) => {
+  const { userId, role } = req.body;
+
+  if (!userId || !role) {
+    return next(new ErrorHandler("UserId and role are required", 400));
+  }
+
+  const allowedRoles = ["Student", "Teacher"];
+  if (!allowedRoles.includes(role)) {
+    return next(new ErrorHandler("Invalid role selected", 400));
+  }
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+
+  if (user.isApproved) {
+    return next(new ErrorHandler("User already approved", 400));
+  }
+
+  user.role = role;
+  user.isApproved = true;
+
+  await user.save();
+const  message=generateApprovalEmailTemplate(user.name,role)
+  try {
+    await sendEmail({
+      to: user.email,
+      subject: "Account Approved",
+      message,
+    });
+  } catch (error) {
+    console.log("Email error:", error.message);
+  }
+
+  res.status(200).json({
+    success: true,
+    message: `User approved as ${role} and email sent`,
+    user,
+  });
+});
 
 export const createStudent=asyncHandler(async(req,res,next)=>{
     const {name,email,password,department}=req.body;
@@ -118,7 +174,9 @@ export const getallUsers=asyncHandler(async(req,res,next)=>{
 })
 
 export const getAllProject=asyncHandler(async(req,res,next)=>{
-    const projects=await projectServices.getAllProjects();
+    let projects=await projectServices.getAllProjects();
+      projects = projects.filter((p) => p.student !== null);
+
     res.json({
         success:true,
         message:"Projects fetched successfully",
@@ -126,26 +184,40 @@ export const getAllProject=asyncHandler(async(req,res,next)=>{
     })
 })
 
-export const getDashboardStats=asyncHandler(async(req,res,next)=>{
-   const [totalStudents,totalTeachers,totalProjects,pendingRequests,completeProjects,pendingProjects]=await Promise.all([
-    User.countDocuments({role:"Student"}),
-    User.countDocuments({role:"Teacher"}),
-    Project.countDocuments(),
-    SupervisorRequest.countDocuments({status:"pending"}),
-    Project.countDocuments({status:"completed"}),
-    Project.countDocuments({status:"pending"}),
-   ]);
+export const getDashboardStats = asyncHandler(async (req, res, next) => {
+  const [totalStudents, totalTeachers, pendingRequests, allProjects] =
+    await Promise.all([
+      User.countDocuments({ role: "Student" }),
+      User.countDocuments({ role: "Teacher" }),
+      SupervisorRequest.countDocuments({ status: "pending" }),
+      Project.find().populate("student"),
+    ]);
 
-   res.status(200).json({
-    success:true,
-    message:"Admin Dashboard stats fetched",
-    data:{
-        totalStudents,totalTeachers,totalProjects,pendingRequests,completeProjects,pendingProjects
-    }
-   })
-   
-   
-})
+  const validProjects = allProjects.filter((p) => p.student !== null);
+
+  const totalProjects = validProjects.length;
+
+  const completeProjects = validProjects.filter(
+    (p) => p.status === "completed"
+  ).length;
+
+  const pendingProjects = validProjects.filter(
+    (p) => p.status === "pending"
+  ).length;
+
+  res.status(200).json({
+    success: true,
+    message: "Admin Dashboard stats fetched",
+    data: {
+      totalStudents,
+      totalTeachers,
+      totalProjects,
+      pendingRequests,
+      completeProjects,
+      pendingProjects,
+    },
+  });
+});
 
 
 export const assignSupervisor=asyncHandler(async(req,res,next)=>{

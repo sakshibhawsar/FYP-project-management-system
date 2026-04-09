@@ -66,21 +66,10 @@ const UploadFiles = () => {
         downloadFile({ projectId: project._id, fileId: file._id }),
       );
 
-      const blob = res.payload;
+      const fileUrl = res.payload;
 
-      if (!blob) return;
-
-      const url = window.URL.createObjectURL(blob);
-
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = file.originalName || "download";
-
-      document.body.appendChild(link);
-      link.click();
-
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      if (!fileUrl) return;
+      window.open(fileUrl, "_blank");
     } catch (error) {
       console.error("Download failed:", error);
     }
@@ -240,6 +229,7 @@ const UploadFiles = () => {
                       <p className="font-medium text-slate-800">
                         {file.originalName}
                       </p>
+
                       <div className="flex items-center text-sm space-x-4 text-slate-600">
                         <span>{file.fileType || "File"}</span>
                       </div>

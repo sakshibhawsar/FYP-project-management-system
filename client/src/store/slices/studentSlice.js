@@ -97,25 +97,18 @@ export const getFeedback=createAsyncThunk("getFeedback",async (projectId,thunkAP
     return thunkAPI.rejectWithValue(error.response.data.message);
  }
 })
-
 export const downloadFile = createAsyncThunk(
-  "downloadFile",
+"downloadFile",
   async ({ projectId, fileId }, thunkAPI) => {
     try {
       const res = await axiosInstance.get(
-        `/student/download/${projectId}/${fileId}`,
-        {
-          responseType: "blob",
-        }
+        `/student/download/${projectId}/${fileId}`
       );
 
-      return res.data; // ✅ Only return blob
+      return res.data.url || res.data.fileUrl||res.data;
     } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Failed to download file"
-      );
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message
+        error.response?.data?.message || "Download failed"
       );
     }
   }
@@ -149,8 +142,7 @@ const studentSlice = createSlice({
       state.supervisors = action.payload?.supervisors||action.payload||[];
     });
       builder.addCase(uploadFiles.fulfilled, (state, action) => {
-    const newFiles=action.payload?.project?.files||action.payload||[];
-    state.files=[...state.files,...newFiles];
+     state.files = action.payload.files;
       });
       builder.addCase(fetchDashboardStats.fulfilled, (state, action) => {
       state.dashboardStats = action.payload||[];

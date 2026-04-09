@@ -2,6 +2,17 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { axiosInstance } from "../../lib/axios";
 import { toast } from "react-toastify";
 
+export const register = createAsyncThunk(
+  "register",
+  async (data, thunkAPI) => {
+    try {
+      const res = await axiosInstance.post("/auth/register", data);
+      return res.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data.message);
+    }
+  }
+);
 
 export const login=createAsyncThunk("login",async(data,thunkAPI)=>{
   try {
@@ -75,7 +86,7 @@ const authSlice = createSlice({
       state.isLoggingIn = true;
     }).addCase(login.fulfilled, (state, action) => {
       state.isLoggingIn = false;
-      state.authUser = action.payload;
+      state.authUser = action.payload.user
     }).addCase(login.rejected, (state) => {
       state.isLoggingIn = false;
     })
