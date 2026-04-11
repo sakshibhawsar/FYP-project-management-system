@@ -7,15 +7,15 @@ const router = express.Router();
 router.post("/", async (req, res) => {
   try {
     const payload = req.body;
-
+console.log("🔥 Webhook HIT");
     const repoUrl = payload.repository?.html_url;
     const commits = payload.commits || [];
 
     if (!repoUrl) return res.sendStatus(400);
-
+console.log("Incoming Repo:", repoUrl);
     // project find
     const project = await Project.findOne({ githubRepo: repoUrl });
-
+console.log("Found Project:", project);
     if (!project) return res.sendStatus(404);
 
     const latestCommit = commits[0];
@@ -34,7 +34,6 @@ router.post("/", async (req, res) => {
     console.log("Webhook error:", err);
     res.sendStatus(500);
   }
-  console.log("Webhook hit:", req.body);
   console.log("🔥 Webhook HIT");
   console.log("Webhook HIT");
 });
