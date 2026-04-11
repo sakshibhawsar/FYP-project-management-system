@@ -6,16 +6,20 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   try {
-    const payload = req.body;
-console.log("🔥 Webhook HIT");
-    const repoUrl = payload.repository?.html_url;
-    const commits = payload.commits || [];
+    console.log("🔥 Webhook HIT");
 
-    if (!repoUrl) return res.sendStatus(400);
-console.log("Incoming Repo:", repoUrl);
-    // project find
-    const project = await Project.findOne({ githubRepo: repoUrl });
-console.log("Found Project:", project);
+    const repoFullName = req.body.repository?.full_name; // ✅ best
+    const commits = req.body.commits || [];
+
+    console.log("Repo Full Name:", repoFullName);
+
+    // project find (using includes / regex)
+    const project = await Project.findOne({
+      githubRepo: { $regex: repoFullName, $options: "i" },
+    });
+
+    console.log("Found Project:", project);
+
     if (!project) return res.sendStatus(404);
 
     const latestCommit = commits[0];
@@ -25,7 +29,7 @@ console.log("Found Project:", project);
 
     await Notification.create({
       type: "github",
-      message: `${author} pushed: "${message}"`,
+      message: `🚀 ${author} pushed: "${message}"`,
       project: project._id,
     });
 
@@ -34,8 +38,6 @@ console.log("Found Project:", project);
     console.log("Webhook error:", err);
     res.sendStatus(500);
   }
-  console.log("🔥 Webhook HIT");
-  console.log("Webhook HIT");
 });
 
 export default router;
