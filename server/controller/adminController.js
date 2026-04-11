@@ -10,7 +10,7 @@ import { generateApprovalEmailTemplate } from "../utils/generateApprovalEmailTem
 import { sendEmail } from "../services/emailService.js";
 
 export const getPendingUsers = asyncHandler(async (req, res, next) => {
-  const users = await User.find({ isApproved: false ,role: { $in: ["Student", "Teacher"] },}).sort({ createdAt: -1 });
+  const users = await User.find({ isApproved: false ,role: { $in: ["Student","Teacher"] },}).sort({ createdAt: -1 });
 
   res.status(200).json({
     success: true,
@@ -22,43 +22,20 @@ export const getPendingUsers = asyncHandler(async (req, res, next) => {
 export const approveUser = asyncHandler(async (req, res, next) => {
   const { userId, role } = req.body;
 
-  if (!userId || !role) {
-    return next(new ErrorHandler("UserId and role are required", 400));
-  }
-
-  const allowedRoles = ["Student", "Teacher"];
-  if (!allowedRoles.includes(role)) {
-    return next(new ErrorHandler("Invalid role selected", 400));
-  }
-
   const user = await User.findById(userId);
 
   if (!user) {
     return next(new ErrorHandler("User not found", 404));
   }
 
-  if (user.isApproved) {
-    return next(new ErrorHandler("User already approved", 400));
-  }
-
   user.role = role;
   user.isApproved = true;
 
   await user.save();
-const  message=generateApprovalEmailTemplate(user.name,role)
-  try {
-    await sendEmail({
-      to: user.email,
-      subject: "Account Approved",
-      message,
-    });
-  } catch (error) {
-    console.log("Email error:", error.message);
-  }
 
   res.status(200).json({
     success: true,
-    message: `User approved as ${role} and email sent`,
+    message: `User role updated to ${role}`,
     user,
   });
 });

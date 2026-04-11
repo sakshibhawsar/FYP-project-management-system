@@ -28,6 +28,7 @@ const ManageStudents = () => {
     email: "",
     department: "",
   });
+  console.log(users);
 
   const dispatch = useDispatch();
 
@@ -64,7 +65,8 @@ const ManageStudents = () => {
       (student.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       (student.email || "").toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter =
-      filterDepartment === "all" || student.department === filterDepartment;
+      filterDepartment === "all" ||
+      student.academicDetails?.department === filterDepartment;
     return matchesSearch && matchesFilter;
   });
 
@@ -92,7 +94,7 @@ const ManageStudents = () => {
     setFormData({
       name: student.name || "",
       email: student.email || "",
-      department: student.department || "",
+      department: student.academicDetails?.department || "",
     });
     setShowModel(true);
   };
@@ -266,7 +268,7 @@ const ManageStudents = () => {
 
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-slate-900 ">
-                            {student.department || "-"}
+                            {student.academicDetails?.department || "-"}
                           </div>
                           <div className="text-sm text-slate-500">
                             {student.createdAt

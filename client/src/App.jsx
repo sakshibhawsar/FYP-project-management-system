@@ -63,9 +63,7 @@ const App = () => {
     if (!authUser) {
       return <Navigate to="/login" replace />;
     }
-    if (!authUser.isApproved) {
-      return <Navigate to="/unauthorized" replace />;
-    }
+
     if (
       allowedRoles?.length &&
       authUser?.role &&

@@ -11,7 +11,8 @@ async({id,data},thunkAPI)=>{
       data
     );
 toast.success(res.data.message||"Deadline updated")
-    return res.data.data?.deadline||res.data.data||res.data;   // blob only
+    return res.data.data?.project 
+      // blob only
   } catch (error) {
     toast.error(error.response.data.message||"Failed to update or create deadline")
     return thunkAPI.rejectWithValue(error.response.data.message)
@@ -29,10 +30,15 @@ const deadlineSlice = createSlice({
   },
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(createDeadlne.fulfilled,(state,action)=>{
-      const item=action.payload;
-      if(item)state.deadlines.push;
-    })
+    builder.addCase(createDeadlne.fulfilled, (state, action) => {
+  const updatedProject = action.payload;
+
+  if (updatedProject?._id) {
+    state.deadlines = state.deadlines.map((p) =>
+      p._id === updatedProject._id ? updatedProject : p
+    );
+  }
+});
   },
 });
 

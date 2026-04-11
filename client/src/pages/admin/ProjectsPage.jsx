@@ -393,18 +393,23 @@ const ProjectsPage = () => {
               </div>
 
               <div className="space-y-4">
+                {/* Title */}
                 <div>
                   <label className="label">Title</label>
                   <div className="input bg-slate-50">
                     {currentProject?.title || "-"}
                   </div>
                 </div>
+
+                {/* Description */}
                 <div>
                   <label className="label">Description</label>
                   <div className="input bg-slate-50">
                     {currentProject?.description || "-"}
                   </div>
                 </div>
+
+                {/* Student + Supervisor */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="label">Student</label>
@@ -412,6 +417,7 @@ const ProjectsPage = () => {
                       {currentProject?.student?.name || "-"}
                     </div>
                   </div>
+
                   <div>
                     <label className="label">Supervisor</label>
                     <div className="input bg-slate-50">
@@ -420,6 +426,25 @@ const ProjectsPage = () => {
                   </div>
                 </div>
 
+                {/* Semester + Year */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="label">Semester</label>
+                    <div className="input bg-slate-50">
+                      {currentProject?.student?.academicDetails?.semester ||
+                        "N/A"}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="label">Year</label>
+                    <div className="input bg-slate-50">
+                      {currentProject?.student?.academicDetails?.year || "N/A"}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Status + Deadline */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="label">Status</label>
@@ -427,6 +452,7 @@ const ProjectsPage = () => {
                       {currentProject?.status}
                     </div>
                   </div>
+
                   <div>
                     <label className="label">Deadline</label>
                     <div className="input bg-slate-50">
@@ -437,6 +463,56 @@ const ProjectsPage = () => {
                   </div>
                 </div>
 
+                {/* 🔥 GitHub Repo */}
+                {currentProject?.githubRepo && (
+                  <div>
+                    <label className="label">GitHub Repository</label>
+
+                    <div className="flex items-center justify-between bg-slate-50 border rounded-lg p-3">
+                      <p className="text-blue-600 text-sm break-all">
+                        {currentProject.githubRepo}
+                      </p>
+
+                      <a
+                        href={currentProject.githubRepo}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-3 bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700">
+                        Open
+                      </a>
+                    </div>
+                  </div>
+                )}
+
+                {/* 🔥 Team Members */}
+                {currentProject?.members?.length > 0 && (
+                  <div>
+                    <label className="label">Team Members</label>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+                      {currentProject.members.map((member, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between bg-slate-50 border rounded-lg p-3">
+                          <div>
+                            <p className="text-slate-800 font-medium">
+                              {member.name}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              {member.email}
+                            </p>
+                          </div>
+
+                          <div className="w-8 h-8 bg-blue-100 text-blue-600 flex items-center justify-center rounded-full font-bold text-sm">
+                            {member.name?.charAt(0)?.toUpperCase()}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Files */}
                 <div>
                   <label className="label">Files</label>
                   {(currentProject.files || []).length === 0 ? (
@@ -444,7 +520,7 @@ const ProjectsPage = () => {
                       No files uploaded.
                     </div>
                   ) : (
-                    <ul className="list-disc list-inside text-sm text-slate-700 ">
+                    <ul className="list-disc list-inside text-sm text-slate-700">
                       {currentProject.files.map((file) => (
                         <li key={file._id || file.fileUrl}>
                           {file.originalName}

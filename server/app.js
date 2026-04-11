@@ -10,6 +10,7 @@ import notificationRouter from './router/notificationRoutes.js';
 import projectRouter from './router/projectRoutes.js';
 import deadlineRouter from './router/deadlineRoutes.js';
 import teacherRouter from './router/teacherRoutes.js';
+import githubWebhook from "./router/githubWebhook.js";
 
 
 
@@ -35,7 +36,7 @@ app.use(cors(
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use("/api/webhook/github", express.json(), githubWebhook);
 app.use("/api/v1/auth",authRouter)
 app.use("/api/v1/admin",adminRouter)
 app.use("/api/v1/student",studentRouter)

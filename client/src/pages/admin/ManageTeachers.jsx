@@ -1,12 +1,16 @@
-import {  useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AddTeacher from "../../components/modal/AddTeacher";
-import {
-  deleteTeacher,
-  updateTeacher,
-} from "../../store/slices/adminSlice";
+import { deleteTeacher, updateTeacher } from "../../store/slices/adminSlice";
 import { toggleTeacherModal } from "../../store/slices/popupSlice";
-import { AlertTriangle, BadgeCheck, Plus, TriangleAlert, Users, X } from "lucide-react";
+import {
+  AlertTriangle,
+  BadgeCheck,
+  Plus,
+  TriangleAlert,
+  Users,
+  X,
+} from "lucide-react";
 
 const ManageTeachers = () => {
   const { users } = useSelector((state) => state.admin);
@@ -29,10 +33,10 @@ const ManageTeachers = () => {
   const dispatch = useDispatch();
 
   const teachers = useMemo(() => {
-   return (users || []).filter((user) => user.role?.toLowerCase() === "teacher");
+    return (users || []).filter(
+      (user) => user.role?.toLowerCase() === "teacher",
+    );
   }, [users]);
-
-  
 
   const departments = useMemo(() => {
     const set = new Set(
@@ -414,14 +418,21 @@ const ManageTeachers = () => {
                       </option>
                       <option value="Database Systems">Database Systems</option>
                       <option value="Computer Network">Computer Network</option>
-                      <option value="Operating Systems">Operating Systems</option>
+                      <option value="Operating Systems">
+                        Operating Systems
+                      </option>
                       <option value="Human-Computer Interaction">
                         Human-Computer Interaction
                       </option>
-                      <option value="Big Data Analytics">Big Data Analytics</option>
-                      <option value="Blockchain Technology">Blockchain Technology</option>
-                      <option value="Internet of Things (IoT)">Internet of Things (IoT)</option>
-
+                      <option value="Big Data Analytics">
+                        Big Data Analytics
+                      </option>
+                      <option value="Blockchain Technology">
+                        Blockchain Technology
+                      </option>
+                      <option value="Internet of Things (IoT)">
+                        Internet of Things (IoT)
+                      </option>
                     </select>
                   </div>
 

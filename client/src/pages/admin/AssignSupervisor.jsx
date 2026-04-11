@@ -53,6 +53,7 @@ const AssignSupervisor = () => {
         deadline: p.deadline
           ? new Date(p.deadline).toISOString().slice(0, 10)
           : "-",
+        deadlineName: p.deadlineName || "Deadline",
         updatedAt: p.updatedAt ? new Date(p.updatedAt).toLocaleString() : "-",
         isApproved: p.status === "approved",
       }));
@@ -248,7 +249,20 @@ const AssignSupervisor = () => {
                       </div>
                     </td>
 
-                    <td className="px-6 py-4">{row.deadline}</td>
+                    <td className="px-6 py-4">
+                      {row.deadline ? (
+                        <div className="px-6 py-4">
+                          <p className="text-sm font-semibold text-slate-800">
+                            {row.deadlineName || "Task"}
+                          </p>
+                          <p className="text-xs text-slate-600">
+                            {new Date(row.deadline).toLocaleDateString("en-GB")}
+                          </p>
+                        </div>
+                      ) : (
+                        <span className="text-slate-400">No Deadline</span>
+                      )}
+                    </td>
                     <td className="px-6 py-4">{row.updatedAt}</td>
 
                     <td className="px-6 py-4 whitespace-nowrap">

@@ -51,9 +51,7 @@ export const login = asyncHandler(async(req,res,next)=>{
         return next(new ErrorHandler("Invalid email or password",401));
     }
 
-    if(!user.isApproved){
-        return next(new ErrorHandler("Wait for admin approval",403));
-    }
+
 
     generateToken(user,200,"Login Successful",res);
 });
@@ -134,3 +132,5 @@ user.resetPasswordExpire=undefined;
 await user.save();
 generateToken(user,200,"Password reset successful",res);
 });
+
+

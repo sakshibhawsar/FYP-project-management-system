@@ -26,34 +26,71 @@ export const getStudentProject=asyncHandler(async(req,res,next)=>{
     })
 });
 
-export const submitProposal=asyncHandler(async(req,res,next)=>{
-    const {title,description}=req.body;
-    const studentId=req.user._id;
 
-    const existingProject=await projectServices.getProjectByStudent(studentId);
+export const updateStudentProfile = asyncHandler(async (req, res, next) => {
+  const { department, semester, year, projectType } = req.body;
 
-    if(existingProject && existingProject.status!=="rejected"){
-        return next(new ErrorHandler("You already have an active project. You can only submit a new proposal if the previous project is rejected",400))
-    }
+  if (!department || !semester || !year || !projectType) {
+    return next(new ErrorHandler("All fields are required", 400));
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      academicDetails: {
+        department,
+        semester,
+        year,
+        projectType,
+        isProfileComplete: true,
+      },
+    },
+    { new: true }
+  );
+
+  res.status(200).json({
+    success: true,
+    message: "Profile updated successfully",
+    user,
+  });
+});
+
+export const submitProposal = asyncHandler(async (req, res, next) => {
+  const { title, description, githubRepo, members } = req.body;
+  const studentId = req.user._id;
+
+  const existingProject = await projectServices.getProjectByStudent(studentId);
+
+  if (existingProject && existingProject.status !== "rejected") {
+    return next(
+      new ErrorHandler(
+        "You already have an active project. You can only submit a new proposal if the previous project is rejected",
+        400
+      )
+    );
+  }
 
   if (existingProject && existingProject.status === "rejected") {
-  await Project.findByIdAndDelete(existingProject._id);
-}
+    await Project.findByIdAndDelete(existingProject._id);
+  }
 
-    const prejectData={
-        student:studentId,
-        title,
-        description,
-    }
-    const project=await projectServices.createProject(prejectData);
+  const prejectData = {
+    student: studentId,
+    title,
+    description,
+    githubRepo,  
+    members,      
+  };
 
-    await User.findByIdAndUpdate(studentId,{project:project._id});
+  const project = await projectServices.createProject(prejectData);
 
-    res.status(201).json({
-        success:true,
-        message:"Project proposal submitted successfully",
-        data:{project},
-    })
+  await User.findByIdAndUpdate(studentId, { project: project._id });
+
+  res.status(201).json({
+    success: true,
+    message: "Project proposal submitted successfully",
+    data: { project },
+  });
 });
 
 export const uploadFiles=asyncHandler(async(req,res,next)=>{
@@ -153,8 +190,8 @@ const project=await Project.findOne({student:studentId}).sort({createdAt:-1}).po
 
 const now =new Date();
 const upcomingDeadline=await Project.find({student:studentId,
-    deadline:{$gte:now},
-}).select("title description deadline").sort({deadline:1}).limit(3).lean();
+    deadline:{$gte:now} ,
+}).select("title description deadline deadlineName").sort({deadline:1}).limit(3).lean();
 
 const topNotifications=await Notification.find({user:studentId})
 .populate("user","name")

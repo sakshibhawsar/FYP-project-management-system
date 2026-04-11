@@ -9,6 +9,7 @@ import {
   getSupervisor,
   requestSupervisor,
   submitProposal,
+  updateStudentProfile,
   uploadFiles,
 } from "../controller/studentController.js"
 import { handleUploadError, upload } from "../middleware/upload.js";
@@ -22,6 +23,7 @@ console.log(getStudentProject);
 router.post("/project-proposal",isAuthenticated, isAuthorized("Student"), submitProposal);
 router.post("/upload/:projectId",isAuthenticated, isAuthorized("Student") ,upload.array("files",10),handleUploadError, uploadFiles);
 router.get("/fetch-supervisors",isAuthenticated, isAuthorized("Student"), getAvailableSupervisors);
+router.put("/update-profile",isAuthenticated, isAuthorized("Student"), updateStudentProfile);
 router.get("/supervisor",isAuthenticated, isAuthorized("Student"), getSupervisor);
 router.post("/request-supervisor",isAuthenticated, isAuthorized("Student"), requestSupervisor);
 router.get("/feedback/:projectId",isAuthenticated, isAuthorized("Student"), getFeedback);

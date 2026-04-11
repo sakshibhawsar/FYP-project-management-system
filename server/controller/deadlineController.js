@@ -30,20 +30,22 @@ export const createDeadline=asyncHandler(async(req,res,next)=>{
         name,
         dueDate:new Date(dueDate),
         createdBy:req.user._id,
-        project:project||null,
+        project:project._id,
     }
 
     const deadline=await Deadline.create(deadlineData)
 
     await deadline.populate([{path:'createdBy',select:'name email'}])
-if(project){
-    await Project.findByIdAndUpdate(project,{deadline:dueDate},{new:true,runValidators:true})
-}
+
+const updatedProject = await Project.findByIdAndUpdate(project._id, {
+  deadline: dueDate,
+  deadlineName: name,
+}, { new: true }).populate("student supervisor");
 
 return res.status(200).json({
     success:true,
     message:"Deadline created successfully",
-    data:{deadline}
+   data:{ project:updatedProject}
 })
 
 })

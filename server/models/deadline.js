@@ -9,14 +9,14 @@ const deadlineSchema=new mongoose.Schema({
     },
     dueDate:{
          type:String,
-         required:[ true,'Due date is required'],
+         required:true,
     },
     createdBy:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',
         required:[ true,'Creator By is required'],
     },
-     Project:{
+     project:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Project',
         default:null,
@@ -25,8 +25,9 @@ const deadlineSchema=new mongoose.Schema({
 
 //indexing for better query performance
 deadlineSchema.index({dueDate:1});
+deadlineSchema.index({name:1});
 deadlineSchema.index({createdBy:1});
-deadlineSchema.index({Project:1});
+deadlineSchema.index({project:1});
 
 
 export const Deadline=mongoose.models.Deadline || mongoose.model('Deadline',deadlineSchema);

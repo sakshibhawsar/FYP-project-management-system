@@ -68,6 +68,19 @@ export const logout=createAsyncThunk("auth/logout",async(_,thunkAPI)=>{
   }
 })
 
+export const updateProfile = createAsyncThunk(
+  "student/updateProfile",
+  async (data, thunkAPI) => {
+    try {
+      const res = await axiosInstance.put("/student/update-profile", data);
+      toast.success(res.data.message);
+      return res.data.user;
+    } catch (error) {
+      toast.error(error.response.data.message);
+      return thunkAPI.rejectWithValue(error.response.data.message);
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: "auth",
@@ -129,6 +142,9 @@ const authSlice = createSlice({
       state.isUpdatingPassword=false
     })
 
+    builder.addCase(updateProfile.fulfilled, (state, action) => {
+  state.authUser = action.payload; // 🔥 VERY IMPORTANT
+});
   },
 });
 

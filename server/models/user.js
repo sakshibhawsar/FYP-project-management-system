@@ -29,18 +29,36 @@ const userSchema = new mongoose.Schema({
         default:'Student',
         enum:['Student','Teacher','Admin'],
     },
+
     isApproved: {
   type: Boolean,
   default: false
 },
+  department: {
+    type: String,
+  },
+academicDetails: {
+  department: {
+    type: String,
+  },
+  semester: {
+    type: Number,
+  },
+  year: {
+    type: Number,
+  },
+  projectType: {
+    type: String,
+    enum: ["minor", "major"],
+  },
+  isProfileComplete: {
+    type: Boolean,
+    default: false,
+  }
+},
     resetPasswordToken:String,
     resetPasswordExpire:Date,
 
-    department:{
-        type:String,
-       trim:true,
-       default:null,
-    },
     experties:{
         type:[String],
          default:[],

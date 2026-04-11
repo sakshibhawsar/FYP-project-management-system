@@ -65,7 +65,17 @@ const projectSchema = new mongoose.Schema(
       default: "pending",
       enum: ["pending", "approved", "rejected", "completed"],
     },
+githubRepo: {
+  type: String,
+  required: true,
+},
 
+members: [
+  {
+    name: String,
+    email: String,
+  },
+],
     files: [
       {
         fileType: {
@@ -95,6 +105,9 @@ const projectSchema = new mongoose.Schema(
 
     deadline: {
       type: Date,
+    },
+    deadlineName: {
+      type: String,
     },
   },
   {

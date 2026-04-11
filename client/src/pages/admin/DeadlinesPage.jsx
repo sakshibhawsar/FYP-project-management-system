@@ -7,6 +7,7 @@ const DeadlinesPage = () => {
   const [showModel, setShowModel] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [formData, setFormData] = useState({
+    name: "",
     projectTitle: "",
     studentName: "",
     supervisor: "",
@@ -36,9 +37,11 @@ const DeadlinesPage = () => {
       deadline: p.deadline
         ? new Date(p.deadline).toISOString().slice(0, 10)
         : "-",
-      updatedAt: p.updatedAt ? new Date(p.deadline).toLocaleString() : "-",
+      name: p.deadlineName || "",
+      updatedAt: p.updatedAt ? new Date(p.updatedAt).toLocaleString() : "-",
     }));
   }, [viewProjects]);
+  console.log(projectRows);
 
   const filteredProjects = projectRows.filter((row) => {
     const matchesSearch =
@@ -49,10 +52,13 @@ const DeadlinesPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedProject || !formData.deadlineDate) return;
+    if (!selectedProject || !formData.deadlineDate || !formData.name) {
+      alert("All fields are required");
+      return;
+    }
 
     let deadlineData = {
-      name: selectedProject?.student?.name,
+      name: formData.name,
       dueDate: formData.deadlineDate,
       project: selectedProject?._id,
     };
@@ -61,18 +67,27 @@ const DeadlinesPage = () => {
       const updated = await dispatch(
         createDeadlne({ id: selectedProject._id, data: deadlineData }),
       ).unwrap();
-      const updatedProjects = updated?.project || updated;
 
-      if (updatedProjects?._id) {
+      const updatedProject = updated; //
+
+      if (updatedProject?._id) {
         setViewProjects((prev) =>
           prev.map((p) =>
-            p._id === updatedProjects._id ? { ...p, ...updatedProjects } : p,
+            p._id === updatedProject._id
+              ? {
+                  ...p,
+                  ...updatedProject,
+                }
+              : p,
           ),
         );
+
+        console.log(updatedProject);
       }
     } finally {
       setShowModel(false);
       setFormData({
+        name: "",
         projectTitle: "",
         studentName: "",
         supervisor: "",
@@ -174,7 +189,20 @@ const DeadlinesPage = () => {
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-4">{row.deadline}</td>
+                      <td className="px-6 py-4">
+                        {row.deadline ? (
+                          <div>
+                            <div className="text-sm font-semibold text-slate-800">
+                              {row.name}
+                            </div>
+                            <div className="text-xs text-slate-500">
+                              {row.deadline}
+                            </div>
+                          </div>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
                       <td className="px-6 py-4">{row.updatedAt}</td>
                     </tr>
                   );
@@ -264,6 +292,21 @@ const DeadlinesPage = () => {
                 </div>
 
                 <div>
+                  <label className="label">Deadline Type</label>
+                  <select
+                    className="input-field w-full"
+                    value={formData.name}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }>
+                    <option value="">Select Type</option>
+                    <option value="Synopsis">Synopsis</option>
+                    <option value="Project Submission">
+                      Project Submission
+                    </option>
+                    <option value="Presentation">Presentation</option>
+                    <option value="Viva">Viva</option>
+                  </select>
                   <label className="label">Deadline</label>
                   <input
                     type="date"

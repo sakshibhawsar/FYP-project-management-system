@@ -196,6 +196,58 @@ const SupervisorPage = () => {
                   </p>
                 </div>
               )}
+              {/* GitHub Repo */}
+              {project?.githubRepo && (
+                <div>
+                  <label className="text-sm font-medium text-slate-500 uppercase tracking-wide">
+                    GitHub Repository
+                  </label>
+
+                  <div className="mt-2 flex items-center justify-between bg-slate-50 border rounded-lg p-3">
+                    <p className="text-blue-600 text-sm break-all">
+                      {project.githubRepo}
+                    </p>
+
+                    <a
+                      href={project.githubRepo}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-4 text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                      Open
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              {/* Team Members */}
+              {project?.members?.length > 0 && (
+                <div>
+                  <label className="text-sm font-medium text-slate-500 uppercase tracking-wide">
+                    Team Members
+                  </label>
+
+                  <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {project.members.map((member, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between bg-slate-50 border rounded-lg p-3 hover:shadow-sm transition">
+                        <div>
+                          <p className="text-slate-800 font-medium">
+                            {member.name}
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            {member.email}
+                          </p>
+                        </div>
+
+                        <div className="w-8 h-8 bg-blue-100 text-blue-600 flex items-center justify-center rounded-full text-sm font-bold">
+                          {member.name?.charAt(0)?.toUpperCase()}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
