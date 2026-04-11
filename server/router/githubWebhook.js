@@ -36,6 +36,7 @@ router.post("/", async (req, res) => {
   }
   console.log("Webhook hit:", req.body);
   console.log("🔥 Webhook HIT");
+  console.log("Webhook HIT");
 });
 
 export default router;
