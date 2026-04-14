@@ -19,6 +19,7 @@ export const fetchProject=createAsyncThunk("student/fetchProject",async (_,thunk
   try {
     const res=await axiosInstance.get("/student/project");
     return res.data.data?.project;
+    
   } catch (error) {
     toast.error(error.response.data.message || "Failed to fetch project");
     return thunkAPI.rejectWithValue(error.response.data.message);
@@ -77,6 +78,23 @@ export const uploadFiles=createAsyncThunk("student/uploadFiles",async ({projectI
     return thunkAPI.rejectWithValue(error.response.data.message);
   }
 })
+
+export const submitProjectLinks = createAsyncThunk(
+  "project/submitLinks",
+  async ({ projectId, githubRepo, liveLink }, thunkAPI) => {
+ try {
+     const { data } = await axiosInstance.put(
+      `/student/submit-links/${projectId}`,
+      { githubRepo, liveLink }
+    );
+    return data;
+ } catch (error) {
+  toast.error(error.response.data.message || "Failed to submit project links");
+  return thunkAPI.rejectWithValue(error.response.data.message);
+
+ }
+  }
+);
 
 export const fetchDashboardStats=createAsyncThunk("fetchDashboardStats",async (_,thunkAPI)=>{
  try {

@@ -433,6 +433,7 @@ const ProjectsPage = () => {
                     <div className="input bg-slate-50">
                       {currentProject?.student?.academicDetails?.semester ||
                         "N/A"}
+                      <sup>th</sup> Semester
                     </div>
                   </div>
 
@@ -440,6 +441,7 @@ const ProjectsPage = () => {
                     <label className="label">Year</label>
                     <div className="input bg-slate-50">
                       {currentProject?.student?.academicDetails?.year || "N/A"}
+                      <sup>th</sup> Year
                     </div>
                   </div>
                 </div>

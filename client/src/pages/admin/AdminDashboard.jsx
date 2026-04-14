@@ -45,6 +45,8 @@ const AdminDashboard = () => {
 
   const [isReportsModelOpen, setIsReportsModelOpen] = useState(false);
   const [reportSearch, setReportSearch] = useState("");
+  const [selectedSupervisor, setSelectedSupervisor] = useState(null);
+  const [isSupervisorModalOpen, setIsSupervisorModalOpen] = useState(false);
 
   useEffect(() => {
     dispatch(getDashboardStats());
@@ -140,7 +142,13 @@ const AdminDashboard = () => {
     if (t === "system") return "bg-slate-600";
     return "bg-slate-400";
   };
+  const supervisorProjects = useMemo(() => {
+    if (!selectedSupervisor) return [];
 
+    return (projects || []).filter(
+      (p) => p.supervisor?.name === selectedSupervisor,
+    );
+  }, [projects, selectedSupervisor]);
   const getBadgeClasses = (kind, value) => {
     const v = (value || "").toLowerCase();
     if (kind === "type") {
@@ -160,6 +168,11 @@ const AdminDashboard = () => {
     if (v === "medium") return "bg-yellow-100 text-yellow-800";
     if (v === "low") return "bg-gray-100 text-gray-800";
     return "bg-slate-100 text-slate-800";
+  };
+
+  const handleBarClick = (data) => {
+    setSelectedSupervisor(data.name);
+    setIsSupervisorModalOpen(true);
   };
 
   const dashboardStats = [
@@ -309,7 +322,10 @@ const AdminDashboard = () => {
                         }}
                         labelFormatter={(label) => `Supervisor: ${label}`}
                       />
-                      <Bar dataKey="count" radius={[8, 8, 0, 0]}>
+                      <Bar
+                        onClick={(data) => handleBarClick(data)}
+                        dataKey="count"
+                        radius={[8, 8, 0, 0]}>
                         {supervisorBucket.map((entry, index) => {
                           const colors = [
                             "#1E3ABA",
@@ -328,6 +344,63 @@ const AdminDashboard = () => {
                       </Bar>
                     </BarChart>
                   </ResponsiveContainer>
+                  {isSupervisorModalOpen && (
+                    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+                      <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl mx-4 p-6">
+                        {/* Header */}
+                        <div className="flex justify-between items-center mb-5">
+                          <h3 className="text-xl font-semibold text-slate-800">
+                            {selectedSupervisor}
+                          </h3>
+
+                          <button
+                            onClick={() => setIsSupervisorModalOpen(false)}
+                            className="p-2 rounded-lg hover:bg-slate-100 transition">
+                            <X className="w-5 h-5 text-slate-600" />
+                          </button>
+                        </div>
+
+                        {/* Content */}
+                        {supervisorProjects.length === 0 ? (
+                          <p className="text-slate-500 text-sm">
+                            No data found
+                          </p>
+                        ) : (
+                          <div className="grid sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-1">
+                            {supervisorProjects.map((p) => (
+                              <div
+                                key={p._id}
+                                className="bg-white border border-slate-200 rounded-xl p-4 hover:shadow-lg transition-all duration-200">
+                                {/* Project Title */}
+                                <h4 className="text-sm font-semibold text-slate-800 mb-2 truncate">
+                                  {p.title}
+                                </h4>
+
+                                {/* Student Info */}
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <p className="text-xs font-medium text-slate-700">
+                                      {p.student?.name || "N/A"}
+                                    </p>
+
+                                    <p className="text-[11px] text-slate-500">
+                                      {p.student?.academicDetails?.year || "—"}{" "}
+                                      Year
+                                    </p>
+                                  </div>
+
+                                  {/* Badge */}
+                                  <span className="text-[10px] px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
+                                    Project
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

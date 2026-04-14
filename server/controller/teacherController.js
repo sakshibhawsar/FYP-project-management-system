@@ -201,14 +201,19 @@ export const getFiles=asyncHandler(async(req,res,next)=>{
     const teacherId=req.user._id
 
     const projects=await projectServices.getProjectBySupervisor(teacherId)
+const validProjects = projects.filter(
+  (p) => p.student && p.supervisor
+);
+    const allFiles = validProjects.flatMap((project) =>
+  (project.files || []).map((file) => ({
+    ...(file.toObject ? file.toObject() : file),
+    projectId: project._id,
+    projectTitle: project.title,
+    studentName: project.student.name,
+    projectEmail: project.student.email,
+  }))
+);
 
-    const allFiles=projects.flatMap((project)=>project.files.map((file)=>({
-        ...file.toObject(),
-        projectId:project._id,
-        projectTitle:project.title,
-        studentName:project.student.name,
-        projectEmail:project.student.email,
-    })))
 
     res.status(200).json({
         success:true,

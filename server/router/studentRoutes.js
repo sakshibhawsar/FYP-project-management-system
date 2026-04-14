@@ -8,6 +8,7 @@ import {
   getStudentProject,
   getSupervisor,
   requestSupervisor,
+  submitProjectLinks,
   submitProposal,
   updateStudentProfile,
   uploadFiles,
@@ -21,6 +22,7 @@ router.get("/project",isAuthenticated, isAuthorized("Student"), getStudentProjec
 console.log(getStudentProject);
 
 router.post("/project-proposal",isAuthenticated, isAuthorized("Student"), submitProposal);
+router.put("/submit-links/:projectId", isAuthenticated,isAuthorized("Student"), submitProjectLinks);
 router.post("/upload/:projectId",isAuthenticated, isAuthorized("Student") ,upload.array("files",10),handleUploadError, uploadFiles);
 router.get("/fetch-supervisors",isAuthenticated, isAuthorized("Student"), getAvailableSupervisors);
 router.put("/update-profile",isAuthenticated, isAuthorized("Student"), updateStudentProfile);

@@ -67,9 +67,13 @@ const projectSchema = new mongoose.Schema(
     },
 githubRepo: {
   type: String,
-  required: true,
+  default: "",
 },
 
+liveLink: {
+  type: String,
+  default: "",
+},
 members: [
   {
     name: String,

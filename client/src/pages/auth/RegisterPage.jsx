@@ -56,7 +56,7 @@ const RegisterPage = () => {
     setIsLoading(false);
 
     if (res.meta.requestStatus === "fulfilled") {
-      toast.success("Registered! Wait for admin approval");
+      toast.success("Registration successful!");
       navigate("/login");
     }
   };

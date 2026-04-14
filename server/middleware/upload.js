@@ -1,129 +1,101 @@
 import multer from "multer";
-import cloudinary from "../config/cloudinary.js"; // 
+import cloudinary from "../config/cloudinary.js";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 
 const storage = new CloudinaryStorage({
-  cloudinary: cloudinary, //  FIXED
-params: async (req, file) => {
-  let folder = "temp";
+  cloudinary: cloudinary,
 
-  if (req.route.path.includes("/upload/:projectId")) {
-    folder = `projects/${req.params.projectId}`;
-  } else if (req.route.path.includes("/upload/:userId")) {
-    folder = `users/${req.params.userId}`;
-  }
+  params: async (req, file) => {
+    let folder = "temp";
 
-  const ext = file.originalname.split(".").pop().toLowerCase();
+    if (req.route.path.includes("/upload/:projectId")) {
+      folder = `projects/${req.params.projectId}`;
+    } else if (req.route.path.includes("/upload/:userId")) {
+      folder = `users/${req.params.userId}`;
+    }
 
-  return {
-    folder,
+    // ✅ remove extension from filename
+    const fileNameWithoutExt = file.originalname
+      .split(".")
+      .slice(0, -1)
+      .join(".");
 
-    resource_type: "auto", // ⭐ keep this
+    return {
+      folder,
+      resource_type: "auto", // auto detect type
 
-    format: ext, // ⭐ VERY IMPORTANT (forces correct type)
+      // ❌ removed format (fixes double extension issue)
 
-    public_id: `${Date.now()}-${file.originalname
-      .replace(/\s+/g, "_")
-      .replace(/[^\w.-]/g, "")}`,
+      public_id: `${Date.now()}-${fileNameWithoutExt
+        .replace(/\s+/g, "_")
+        .replace(/[^\w-]/g, "")}`,
 
-    type: "upload",
-  };
-}
+      type: "upload",
+    };
+  },
 });
 
-// File Filter (same as your logic, cleaned)
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = [
-    "application/pdf",
-    "application/msword",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    "application/vnd.ms-powerpoint",
-    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-    "application/zip",
-    "application/x-zip-compressed",
-    "application/x-rar-compressed",
-    "application/x-rar",
-    "application/vnd.rar",
-    "application/octet-stream",
-    "image/jpeg",
-    "image/png",
-    "image/gif",
-    "text/plain",
-    "application/javascript",
-    "text/css",
-    "text/html",
-    "application/json",
-  ];
+// ✅ File Filter (only docs + images)
+// const fileFilter = (req, file, cb) => {
+//   const allowedTypes = [
+//     "application/pdf",
+//     "application/msword",
+//     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+//     "application/vnd.ms-powerpoint",
+//     "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+//     "image/jpeg",
+//     "image/png",
+//     "image/jpg",
+//   ];
 
-  const allowedExtensions = [
-    ".pdf",
-    ".doc",
-    ".docx",
-    ".ppt",
-    ".pptx",
-    ".zip",
-    ".rar",
-    ".jpg",
-    ".jpeg",
-    ".png",
-    ".gif",
-    ".txt",
-    ".js",
-    ".css",
-    ".html",
-    ".json",
-  ];
+  // const fileExt = file.originalname.split(".").pop().toLowerCase();
+  // const allowedExtensions = ["pdf", "doc", "docx", "ppt", "pptx", "jpg", "jpeg", "png"];
 
-  const fileExt = file.originalname.split(".").pop().toLowerCase();
-  const extWithDot = "." + fileExt;
+  // if (
+  //   allowedTypes.includes(file.mimetype) &&
+  //   allowedExtensions.includes(fileExt)
+  // ) {
+  //   cb(null, true);
+  // } else {
+  //   cb(
+  //     new Error("Only PDF, DOC, DOCX, PPT, PPTX and Images are allowed"),
+  //     false
+  //   );
+  // }
 
-  if (
-    allowedTypes.includes(file.mimetype) ||
-    allowedExtensions.includes(extWithDot)
-  ) {
-    cb(null, true);
-  } else {
-    cb(
-      new Error(
-        "Invalid file type. Only PDF, DOC, DOCX, PPTX, ZIP, RAR, IMAGES, and code files are allowed"
-      ),
-      false
-    );
-  }
-};
 
-// 🚀 Multer Upload Config
+// 🚀 Multer config
 const upload = multer({
   storage,
-  fileFilter,
+  
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB
     files: 10,
   },
 });
 
-// ⚠️ Error Handler (same as yours, cleaned)
+// ⚠️ Error handler
 const handleUploadError = (err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === "LIMIT_FILE_SIZE") {
       return res.status(400).json({
         success: false,
-        message: "File size exceeds the limit of 10MB",
+        message: "File size exceeds 10MB",
       });
     }
 
     if (err.code === "LIMIT_FILE_COUNT") {
       return res.status(400).json({
         success: false,
-        message: "File count exceeds the limit of 10 files",
+        message: "Max 10 files allowed",
       });
     }
   }
 
-  if (err.message && err.message.includes("Invalid file type")) {
+  if (err.message) {
     return res.status(400).json({
       success: false,
-      error: err.message,
+      message: err.message,
     });
   }
 

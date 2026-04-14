@@ -6,7 +6,6 @@ const SubmitProposal = () => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    githubRepo: "",
   });
 
   const [members, setMembers] = useState([{ name: "", email: "" }]);
@@ -49,7 +48,6 @@ const SubmitProposal = () => {
     setFormData({
       title: "",
       description: "",
-      githubRepo: "",
     });
 
     setMembers([{ name: "", email: "" }]);
@@ -91,20 +89,6 @@ const SubmitProposal = () => {
               onChange={handleChange}
               className="input w-full min-h-[120px]"
               placeholder="Explain your project..."
-              required
-            />
-          </div>
-
-          {/* GitHub */}
-          <div>
-            <label className="label">GitHub Repository</label>
-            <input
-              type="text"
-              name="githubRepo"
-              value={formData.githubRepo}
-              onChange={handleChange}
-              className="input w-full"
-              placeholder="https://github.com/your-repo"
               required
             />
           </div>

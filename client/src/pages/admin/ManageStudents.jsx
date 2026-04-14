@@ -28,7 +28,6 @@ const ManageStudents = () => {
     email: "",
     department: "",
   });
-  console.log(users);
 
   const dispatch = useDispatch();
 
@@ -55,7 +54,9 @@ const ManageStudents = () => {
 
   const departments = useMemo(() => {
     const set = new Set(
-      (students || []).map((student) => student.department).filter(Boolean),
+      (students || [])
+        .map((student) => student.academicDetails?.department)
+        .filter(Boolean),
     );
     return Array.from(set);
   }, [students]);

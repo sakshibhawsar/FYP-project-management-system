@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../../store/slices/authSlice";
 import { BookOpen, Loader } from "lucide-react";
-import { toast } from "react-toastify";
 
 const LoginPage = () => {
   const dispatch = useDispatch();
@@ -58,10 +57,7 @@ const LoginPage = () => {
 
     if (res.meta.requestStatus === "fulfilled") {
       const user = res.payload.user;
-      if (!user.isApproved) {
-        toast.error("Wait for admin approval");
-        return;
-      }
+      if (!user.isApproved) return;
       if (user.role === "Admin") {
         navigate("/admin");
       } else if (user.role === "Teacher") {

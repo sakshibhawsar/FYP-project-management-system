@@ -29,7 +29,10 @@ export const registerUser = asyncHandler(async(req,res,next)=>{
 
     await user.save();
 
-    generateToken(user,201,"User Registered Successfully",res);
+   res.status(201).json({
+  success: true,
+  message: "Registered successfully",
+}); 
 });
 
 export const login = asyncHandler(async(req,res,next)=>{

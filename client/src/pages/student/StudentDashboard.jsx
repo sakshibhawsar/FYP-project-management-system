@@ -4,12 +4,15 @@ import { fetchDashboardStats } from "../../store/slices/studentSlice";
 import { Link } from "react-router-dom";
 import { Bell, MessageCircle, MessageCircleWarning } from "lucide-react";
 import { updateProfile } from "../../store/slices/authSlice";
+import ProjectLinksForm from "./ProjectLinksForm";
 
 const StudentDashboard = () => {
   const dispatch = useDispatch();
   const { authUser } = useSelector((state) => state.auth);
   const { dashboardStats } = useSelector((state) => state.student);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showLinksModal, setShowLinksModal] = useState(false);
+  const [showLinksPopup, setShowLinksPopup] = useState(false);
   const [profileData, setProfileData] = useState({
     department: "",
     semester: "",
@@ -194,7 +197,21 @@ const StudentDashboard = () => {
                   {project?.status || "Unknown"}
                 </span>
               </div>
+              {project?.status === "approved" && !project?.githubRepo && (
+                <button
+                  onClick={() => setShowLinksModal(true)}
+                  className="mt-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg shadow hover:scale-95     transition">
+                  Submit Project Links
+                </button>
+              )}
 
+              {project?.githubRepo && project?.liveLink && (
+                <button
+                  onClick={() => setShowLinksPopup(true)}
+                  className="mt-3 text-sm text-gray-200 p-2 rounded-sm bg-blue-600 font-medium hover:bg-blue-700 flex items-center gap-1">
+                  View Links
+                </button>
+              )}
               <div>
                 <label className="text-sm font-medium text-slate-600">
                   Submission Deadline
@@ -504,6 +521,64 @@ const StudentDashboard = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+        {showLinksModal && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl w-full max-w-md p-6 relative">
+              <button
+                onClick={() => setShowLinksModal(false)}
+                className="absolute top-3 right-3 text-gray-500 hover:text-red-500">
+                ✕
+              </button>
+
+              <h2 className="text-xl font-bold mb-4">Submit Project Links</h2>
+
+              <ProjectLinksForm
+                projectId={project._id}
+                closeModal={() => setShowLinksModal(false)}
+              />
+            </div>
+          </div>
+        )}
+        {showLinksPopup && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl w-full max-w-sm p-6 relative shadow-xl">
+              {/* Close */}
+              <button
+                onClick={() => setShowLinksPopup(false)}
+                className="absolute top-3 right-3 text-gray-400 hover:text-red-500">
+                ✕
+              </button>
+
+              {/* Header */}
+              <h2 className="text-lg font-semibold text-slate-800 mb-4">
+                Project Links
+              </h2>
+
+              {/* Links */}
+              <div className="space-y-3">
+                <a
+                  href={project.githubRepo}
+                  target="_blank"
+                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50 transition">
+                  <span className="text-sm text-slate-700">
+                    🔗 GitHub Repository
+                  </span>
+                  <span className="text-blue-600 text-xs">Open</span>
+                </a>
+
+                <a
+                  href={project.liveLink}
+                  target="_blank"
+                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50 transition">
+                  <span className="text-sm text-slate-700">
+                    🌐 Live Project
+                  </span>
+                  <span className="text-blue-600 text-xs">Open</span>
+                </a>
+              </div>
             </div>
           </div>
         )}

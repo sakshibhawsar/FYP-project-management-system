@@ -7,7 +7,7 @@ const PendingUser = () => {
   const { pendingUsers, loading } = useSelector((state) => state.admin);
 
   const [roles, setRoles] = useState({});
-
+  const [searchTerm, setSearchTerm] = useState("");
   useEffect(() => {
     dispatch(getPendingUsers());
   }, [dispatch]);
@@ -16,24 +16,36 @@ const PendingUser = () => {
     const role = roles[userId] || "Student";
     dispatch(approveUser({ userId, role }));
   };
-
+  const filteredUsers = pendingUsers?.filter((user) =>
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="card">
-        <h1 className="text-xl font-bold text-slate-800">
-          Pending Users Approval
-        </h1>
-        <p className="text-slate-500 text-sm">
-          Approve new users and assign roles
-        </p>
-      </div>
+      <div className="card flex justify-between items-center">
+        <div>
+          <h1 className="text-xl font-bold text-slate-800">
+            Pending Users Approval
+          </h1>
+          <p className="text-slate-500 text-sm">
+            Approve new users and assign roles
+          </p>
+        </div>
 
+        {/* 🔍 Search Input */}
+        <input
+          type="text"
+          placeholder="Search by name..."
+          className="input w-64"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
       {/* Table */}
       <div className="card overflow-x-auto">
         {loading ? (
           <p className="text-center py-6">Loading...</p>
-        ) : pendingUsers?.length === 0 ? (
+        ) : filteredUsers?.length === 0 ? (
           <p className="text-center py-6 text-slate-500">
             No pending users found
           </p>
@@ -49,7 +61,7 @@ const PendingUser = () => {
             </thead>
 
             <tbody className="divide-y">
-              {pendingUsers.map((user) => (
+              {filteredUsers.map((user) => (
                 <tr key={user._id} className="hover:bg-slate-50">
                   {/* Name */}
                   <td className="px-6 py-3">{user.name}</td>

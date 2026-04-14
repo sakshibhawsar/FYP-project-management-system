@@ -56,7 +56,7 @@ export const updateStudentProfile = asyncHandler(async (req, res, next) => {
 });
 
 export const submitProposal = asyncHandler(async (req, res, next) => {
-  const { title, description, githubRepo, members } = req.body;
+  const { title, description, members } = req.body;
   const studentId = req.user._id;
 
   const existingProject = await projectServices.getProjectByStudent(studentId);
@@ -78,7 +78,6 @@ export const submitProposal = asyncHandler(async (req, res, next) => {
     student: studentId,
     title,
     description,
-    githubRepo,  
     members,      
   };
 
@@ -93,21 +92,55 @@ export const submitProposal = asyncHandler(async (req, res, next) => {
   });
 });
 
+
+export const submitProjectLinks = asyncHandler(async (req, res, next) => {
+  const { projectId } = req.params;
+  const { githubRepo, liveLink } = req.body;
+
+  const project = await Project.findById(projectId);
+
+  if (!project) {
+    return next(new ErrorHandler("Project not found", 404));
+  }
+
+  if (project.status !== "approved") {
+    return next(new ErrorHandler("Project not approved yet", 400));
+  }
+
+  if (!githubRepo || !liveLink) {
+    return next(new ErrorHandler("Both links are required", 400));
+  }
+
+  project.githubRepo = githubRepo;
+  project.liveLink = liveLink;
+
+
+  await project.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Project links submitted successfully",
+    project,
+  });
+});
+
 export const uploadFiles=asyncHandler(async(req,res,next)=>{
 const {projectId}=req.params;
 const studentId=req.user._id;
 const project=await projectServices.getProjectById(projectId);
+const files = await req.files; 
+console.log(files)// Assuming you're using multer and the files are in req.files
 
 if(!project||project.student._id.toString()!==studentId.toString()||project.status==="rejected"){
     return next(new ErrorHandler("Not authorized to upload files to this project",403))
 }
 
-if(!req.files||req.files.length===0){
+if(! files|| files.length===0){
     return next(new ErrorHandler("No files uploaded",400))
 }
 
-const updatedProject=await projectServices.addFilesToProject(projectId,req.files);
-
+const updatedProject=await projectServices.addFilesToProject(projectId,files);
+console.log(updatedProject);
 res.status(200).json({
     success:true,
     message:"Files uploaded successfully",
@@ -263,6 +296,7 @@ export const downloadFile = asyncHandler(async (req, res, next) => {
 
   if (!file) return next(new ErrorHandler("File not found", 404));
 
+  console.log(file.fileUrl)
   const downloadUrl = file.fileUrl.replace(
     "/upload/",
     "/upload/fl_attachment/"

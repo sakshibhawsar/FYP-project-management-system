@@ -74,8 +74,6 @@ const ManageTeachers = () => {
     }
 
     handleCloseModal();
-
-    console.log(formData);
   };
 
   const handleEdit = (teacher) => {

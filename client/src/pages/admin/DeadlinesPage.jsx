@@ -41,7 +41,6 @@ const DeadlinesPage = () => {
       updatedAt: p.updatedAt ? new Date(p.updatedAt).toLocaleString() : "-",
     }));
   }, [viewProjects]);
-  console.log(projectRows);
 
   const filteredProjects = projectRows.filter((row) => {
     const matchesSearch =
@@ -81,8 +80,6 @@ const DeadlinesPage = () => {
               : p,
           ),
         );
-
-        console.log(updatedProject);
       }
     } finally {
       setShowModel(false);
