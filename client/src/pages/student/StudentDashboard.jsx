@@ -101,7 +101,7 @@ const StudentDashboard = () => {
             {authUser?.academicDetails?.isProfileComplete
               ? "Edit Profile"
               : "Complete Profile"}
-          </button>
+          </button> 
         </div>
 
         {/* quick stats */}
